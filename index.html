@@ -2,374 +2,244 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Solitaire Pro v1.1</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>סוליטר פרו - Solitaire Pro</title>
+    
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#2e7d32">
-    <link rel="icon" type="image/jpeg" href="logo.jpg">
+    <meta name="theme-color" content="#1b5e20">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="סוליטר פרו">
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.png">
 
-    <style>
-        :root {
-            --bg-color: #2e7d32;
-            --card-width: 13vw;
-            --card-height: calc(var(--card-width) * 1.4);
-            --spacing: 8px;
-        }
-        @media (min-width: 600px) { :root { --card-width: 85px; } }
-
-        * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; background-color: var(--bg-color); font-family: -apple-system, system-ui, sans-serif; overflow: hidden; touch-action: none; height: 100vh; }
-
-        header {
-            height: 50px; background: rgba(0,0,0,0.4); color: white;
-            display: flex; justify-content: space-between; align-items: center; padding: 0 15px;
-            font-size: 0.9rem;
-        }
-
-        #gameBoard { padding: 10px; display: flex; flex-direction: column; gap: 15px; height: calc(100vh - 50px); max-width: 900px; margin: 0 auto; }
-        .top-row { display: flex; justify-content: space-between; }
-        .piles-group { display: flex; gap: var(--spacing); }
-
-        .pile {
-            width: var(--card-width); height: var(--card-height);
-            border-radius: 6px; border: 1.5px solid rgba(255,255,255,0.15);
-            position: relative; background: rgba(0,0,0,0.1);
-        }
-
-        .tableau-container { display: flex; justify-content: space-between; flex-grow: 1; }
-        .tableau-col { width: var(--card-width); min-height: 200px; position: relative; }
-
-        .card {
-            width: var(--card-width); height: var(--card-height);
-            background: white; border-radius: 5px; position: absolute;
-            box-shadow: 1px 1px 4px rgba(0,0,0,0.4);
-            display: flex; flex-direction: column; padding: 5px;
-            font-weight: bold; font-size: 1rem; border: 0.5px solid #ccc;
-        }
-        .card.red { color: #e53935; }
-        .card.black { color: #212121; }
-        .card.back {
-            background: #1565c0 linear-gradient(135deg, #1e88e5 25%, transparent 25%) -20px 0,
-                        linear-gradient(225deg, #1e88e5 25%, transparent 25%) -20px 0,
-                        linear-gradient(315deg, #1e88e5 25%, transparent 25%),
-                        linear-gradient(45deg, #1e88e5 25%, transparent 25%);
-            background-size: 40px 40px; border: 2px solid white;
-        }
-        
-        /* Dragging state */
-        .card.dragging { z-index: 10000 !important; pointer-events: none; opacity: 0.85; transform: scale(1.05); }
-        .card-stack-drag { pointer-events: none; }
-
-        /* Menu */
-        .side-menu { position: fixed; top: 0; right: -280px; width: 260px; height: 100%; background: #fdfdfd; z-index: 2000; transition: 0.3s; padding: 25px; box-shadow: -5px 0 15px rgba(0,0,0,0.3); }
-        .side-menu.open { transform: translateX(-280px); }
-        .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1500; }
-        .overlay.active { display: block; }
-        
-        button { background: #2e7d32; color: white; border: none; padding: 12px; border-radius: 4px; width: 100%; font-size: 1rem; cursor: pointer; margin-bottom: 10px; }
-    </style>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-
-    <header>
-        <div onclick="toggleMenu()" style="cursor:pointer; font-size:1.5rem;">☰</div>
-        <div>מהלכים: <span id="moves">0</span> | ניקוד: <span id="score">0</span></div>
-        <div style="font-size: 0.7rem; opacity: 0.7;">v1.1</div>
+    <!-- Header -->
+    <header id="mainHeader">
+        <div class="header-left">
+            <button id="menuBtn" class="icon-btn" aria-label="תפריט">
+                <svg viewBox="0 0 24 24" width="28" height="28">
+                    <path fill="currentColor" d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" />
+                </svg>
+            </button>
+            <div class="game-info">
+                <div class="info-item">
+                    <span class="info-label">זמן</span>
+                    <span class="info-value" id="timeDisplay">00:00</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">מהלכים</span>
+                    <span class="info-value" id="movesDisplay">0</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">ניקוד</span>
+                    <span class="info-value" id="scoreDisplay">0</span>
+                </div>
+            </div>
+        </div>
+        <div class="header-center">
+            <div class="title-block">
+                <h1>סוליטר פרו</h1>
+                <small id="versionDisplay" class="version-badge" title="לחץ לאיפוס מלא">v2.0.0</small>
+            </div>
+        </div>
+        <div class="header-right">
+            <button id="undoBtn" class="icon-btn" aria-label="ביטול מהלך" title="ביטול מהלך">
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                    <path fill="currentColor" d="M12.5,8C9.85,8 7.45,9 5.6,10.6L2,7V16H11L7.38,12.38C8.77,11.22 10.54,10.5 12.5,10.5C16.04,10.5 19.05,12.81 20.1,16L22.47,15.22C21.08,11.03 17.15,8 12.5,8Z" />
+                </svg>
+            </button>
+            <button id="hintBtn" class="icon-btn" aria-label="רמז" title="רמז">
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                    <path fill="currentColor" d="M12,2A7,7 0 0,0 5,9C5,11.38 6.19,13.47 8,14.74V17A1,1 0 0,0 9,18H15A1,1 0 0,0 16,17V14.74C17.81,13.47 19,11.38 19,9A7,7 0 0,0 12,2M9,21A1,1 0 0,0 10,22H14A1,1 0 0,0 15,21V20H9V21Z" />
+                </svg>
+            </button>
+        </div>
     </header>
 
+    <!-- Side Menu -->
     <div id="sideMenu" class="side-menu">
-        <h2 style="margin-top:0">Solitaire Pro</h2>
-        <button onclick="app.newGame()">🔄 משחק חדש</button>
-        <button onclick="app.undo()">↩️ בטל מהלך</button>
-        <button onclick="toggleMenu()" style="background:#666">❌ סגור</button>
-    </div>
-    <div id="overlay" class="overlay" onclick="toggleMenu()"></div>
+        <div class="menu-header">
+            <h2>תפריט</h2>
+            <button id="closeMenuBtn" class="close-btn" aria-label="סגור תפריט">
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                    <path fill="currentColor" d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" />
+                </svg>
+            </button>
+        </div>
+        
+        <div class="menu-content">
+            <div class="menu-section">
+                <h3>משחק</h3>
+                <ul class="menu-list">
+                    <li id="newGameBtn">
+                        <svg viewBox="0 0 24 24" width="20" height="20">
+                            <path fill="currentColor" d="M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z" />
+                        </svg>
+                        <span>משחק חדש</span>
+                    </li>
+                    <li id="autoCompleteBtn">
+                        <svg viewBox="0 0 24 24" width="20" height="20">
+                            <path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" />
+                        </svg>
+                        <span>סיום אוטומטי</span>
+                    </li>
+                </ul>
+            </div>
 
+            <div class="menu-section">
+                <h3>הגדרות</h3>
+                <div class="setting-item">
+                    <label for="difficultySelect">רמת קושי:</label>
+                    <select id="difficultySelect" class="custom-select">
+                        <option value="1">קל (1 קלף)</option>
+                        <option value="3" selected>רגיל (3 קלפים)</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label for="tableThemeSelect">רקע שולחן:</label>
+                    <select id="tableThemeSelect" class="custom-select">
+                        <option value="green">ירוק קלאסי</option>
+                        <option value="blue">כחול</option>
+                        <option value="red">אדום</option>
+                        <option value="purple">סגול</option>
+                        <option value="dark">כהה</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label for="cardBackSelect">גב קלף:</label>
+                    <select id="cardBackSelect" class="custom-select">
+                        <option value="blue">כחול</option>
+                        <option value="red">אדום</option>
+                        <option value="green">ירוק</option>
+                        <option value="pattern">משובץ</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label>
+                        <input type="checkbox" id="soundToggle" checked>
+                        <span>צלילים</span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <label>
+                        <input type="checkbox" id="animationsToggle" checked>
+                        <span>אנימציות</span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <label>
+                        <input type="checkbox" id="largeCardsToggle">
+                        <span>קלפים גדולים (נגישות)</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="menu-section">
+                <h3>סטטיסטיקות</h3>
+                <ul class="stats-list">
+                    <li>
+                        <span>משחקים ששוחקו:</span>
+                        <strong id="statsGamesPlayed">0</strong>
+                    </li>
+                    <li>
+                        <span>משחקים שנוצחו:</span>
+                        <strong id="statsGamesWon">0</strong>
+                    </li>
+                    <li>
+                        <span>אחוז ניצחונות:</span>
+                        <strong id="statsWinRate">0%</strong>
+                    </li>
+                    <li>
+                        <span>שיא ניקוד:</span>
+                        <strong id="statsBestScore">0</strong>
+                    </li>
+                    <li>
+                        <span>זמן ממוצע:</span>
+                        <strong id="statsAvgTime">00:00</strong>
+                    </li>
+                </ul>
+                <button id="resetStatsBtn" class="secondary-btn">איפוס סטטיסטיקות</button>
+            </div>
+
+            <div class="menu-section">
+                <h3>אודות</h3>
+                <div class="about-content">
+                    <p><strong>סוליטר פרו</strong></p>
+                    <p>סוליטר קלאסי (Klondike) עם ממשק מודרני ותכונות מתקדמות.</p>
+                    <p class="version-info">גרסה: <span id="aboutVersion">2.0.0</span></p>
+                    <p class="copyright">© 2024 Solitaire Pro</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="overlay" class="overlay"></div>
+
+    <!-- Game Board -->
     <main id="gameBoard">
         <div class="top-row">
-            <div class="piles-group">
-                <div id="stock" class="pile" onclick="app.draw()"></div>
-                <div id="waste" class="pile"></div>
+            <div class="stock-container">
+                <div id="stock" class="pile stock-pile" data-pile="stock">
+                    <div class="pile-placeholder">
+                        <svg viewBox="0 0 24 24" width="40" height="40">
+                            <path fill="currentColor" opacity="0.3" d="M21,16.5C21,16.88 20.79,17.21 20.47,17.38L12.57,21.82C12.41,21.94 12.21,22 12,22C11.79,22 11.59,21.94 11.43,21.82L3.53,17.38C3.21,17.21 3,16.88 3,16.5V7.5C3,7.12 3.21,6.79 3.53,6.62L11.43,2.18C11.59,2.06 11.79,2 12,2C12.21,2 12.41,2.06 12.57,2.18L20.47,6.62C20.79,6.79 21,7.12 21,7.5V16.5M12,4.15L6.04,7.5L12,10.85L17.96,7.5L12,4.15M5,15.91L11,19.29V12.58L5,9.21V15.91M19,15.91V9.21L13,12.58V19.29L19,15.91Z" />
+                        </svg>
+                    </div>
+                </div>
+                <div id="waste" class="pile waste-pile" data-pile="waste"></div>
             </div>
-            <div class="piles-group">
-                <div id="f-0" class="pile foundation" data-type="foundation" data-idx="0"></div>
-                <div id="f-1" class="pile foundation" data-type="foundation" data-idx="1"></div>
-                <div id="f-2" class="pile foundation" data-type="foundation" data-idx="2"></div>
-                <div id="f-3" class="pile foundation" data-type="foundation" data-idx="3"></div>
+            <div class="foundations-container">
+                <div id="foundation-0" class="pile foundation-pile" data-pile="foundation" data-suit="hearts" data-index="0">
+                    <div class="pile-placeholder">♥</div>
+                </div>
+                <div id="foundation-1" class="pile foundation-pile" data-pile="foundation" data-suit="diamonds" data-index="1">
+                    <div class="pile-placeholder">♦</div>
+                </div>
+                <div id="foundation-2" class="pile foundation-pile" data-pile="foundation" data-suit="clubs" data-index="2">
+                    <div class="pile-placeholder">♣</div>
+                </div>
+                <div id="foundation-3" class="pile foundation-pile" data-pile="foundation" data-suit="spades" data-index="3">
+                    <div class="pile-placeholder">♠</div>
+                </div>
             </div>
         </div>
-        <div id="tableau" class="tableau-container">
-            <div class="tableau-col" data-type="tableau" data-idx="0"></div>
-            <div class="tableau-col" data-type="tableau" data-idx="1"></div>
-            <div class="tableau-col" data-type="tableau" data-idx="2"></div>
-            <div class="tableau-col" data-type="tableau" data-idx="3"></div>
-            <div class="tableau-col" data-type="tableau" data-idx="4"></div>
-            <div class="tableau-col" data-type="tableau" data-idx="5"></div>
-            <div class="tableau-col" data-type="tableau" data-idx="6"></div>
-        </div>
+        
+        <div id="tableau" class="tableau-container"></div>
     </main>
 
-    <script>
-        /**
-         * Solitaire Pro - Unified Code Logic
-         */
-        const SYMBOLS = { h: '♥', d: '♦', c: '♣', s: '♠' };
-        const VALUES = { 1: 'A', 11: 'J', 12: 'Q', 13: 'K' };
+    <!-- Win Modal -->
+    <div id="winModal" class="modal">
+        <div class="modal-content win-modal">
+            <div class="confetti-container" id="confettiContainer"></div>
+            <h2>🎉 מזל טוב! 🎉</h2>
+            <p class="win-message">זכית במשחק!</p>
+            <div class="win-stats">
+                <div class="win-stat">
+                    <span class="stat-label">זמן:</span>
+                    <span class="stat-value" id="winTime">00:00</span>
+                </div>
+                <div class="win-stat">
+                    <span class="stat-label">מהלכים:</span>
+                    <span class="stat-value" id="winMoves">0</span>
+                </div>
+                <div class="win-stat">
+                    <span class="stat-label">ניקוד:</span>
+                    <span class="stat-value" id="winScore">0</span>
+                </div>
+            </div>
+            <button id="newGameFromWin" class="primary-btn">משחק חדש</button>
+        </div>
+    </div>
 
-        class Solitaire {
-            constructor() {
-                this.init();
-            }
+    <!-- Hint Indicator -->
+    <div id="hintIndicator" class="hint-indicator"></div>
 
-            init() {
-                const suits = ['h', 'd', 'c', 's'];
-                this.deck = [];
-                suits.forEach(s => {
-                    for (let v = 1; v <= 13; v++) {
-                        this.deck.push({ suit: s, value: v, color: (s === 'h' || s === 'd') ? 'red' : 'black', faceUp: false });
-                    }
-                });
-                this.shuffle(this.deck);
-                
-                this.tableau = [[], [], [], [], [], [], []];
-                let dIdx = 0;
-                for (let i = 0; i < 7; i++) {
-                    for (let j = 0; j <= i; j++) {
-                        let card = this.deck[dIdx++];
-                        if (j === i) card.faceUp = true;
-                        this.tableau[i].push(card);
-                    }
-                }
-                this.stock = this.deck.slice(dIdx);
-                this.waste = [];
-                this.foundations = [[], [], [], []];
-                this.score = 0;
-                this.moves = 0;
-                this.history = [];
-            }
-
-            shuffle(array) {
-                for (let i = array.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [array[i], array[j]] = [array[j], array[i]];
-                }
-            }
-
-            save() {
-                const state = JSON.stringify({
-                    tableau: this.tableau, stock: this.stock, waste: this.waste, 
-                    foundations: this.foundations, score: this.score, moves: this.moves
-                });
-                this.history.push(state);
-                if (this.history.length > 30) this.history.shift();
-            }
-        }
-
-        const game = new Solitaire();
-
-        const ui = {
-            render() {
-                document.getElementById('score').innerText = game.score;
-                document.getElementById('moves').innerText = game.moves;
-
-                // Stock
-                const stockEl = document.getElementById('stock');
-                stockEl.innerHTML = game.stock.length ? `<div class="card back"></div>` : `<div style="display:flex; justify-content:center; align-items:center; height:100%; color:white; font-size:2rem; cursor:pointer">🔄</div>`;
-
-                // Waste (Show last 3, but only top is draggable)
-                const wasteEl = document.getElementById('waste');
-                wasteEl.innerHTML = '';
-                if (game.waste.length) {
-                    const topCard = game.waste[game.waste.length - 1];
-                    wasteEl.appendChild(this.createCard(topCard, 'waste'));
-                }
-
-                // Foundations
-                game.foundations.forEach((f, i) => {
-                    const fEl = document.getElementById(`f-${i}`);
-                    fEl.innerHTML = '';
-                    if (f.length) {
-                        fEl.appendChild(this.createCard(f[f.length - 1], 'foundation', i));
-                    }
-                });
-
-                // Tableau
-                const colEls = document.querySelectorAll('.tableau-col');
-                colEls.forEach((colEl, i) => {
-                    colEl.innerHTML = '';
-                    game.tableau[i].forEach((card, ci) => {
-                        const cardEl = this.createCard(card, 'tableau', i, ci);
-                        cardEl.style.top = (ci * 25) + 'px';
-                        cardEl.style.zIndex = ci;
-                        colEl.appendChild(cardEl);
-                    });
-                });
-            },
-
-            createCard(card, type, pIdx, cIdx) {
-                const el = document.createElement('div');
-                el.className = `card ${card.faceUp ? card.color : 'back'}`;
-                if (card.faceUp) {
-                    el.innerHTML = `<div>${VALUES[card.value] || card.value} ${SYMBOLS[card.suit]}</div>`;
-                    this.attachDrag(el, card, type, pIdx, cIdx);
-                }
-                return el;
-            },
-
-            attachDrag(el, card, type, pIdx, cIdx) {
-                let startX, startY, draggedEls = [];
-
-                const onMove = (e) => {
-                    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-                    const dx = clientX - startX;
-                    const dy = clientY - startY;
-                    draggedEls.forEach(obj => {
-                        obj.el.style.transform = `translate(${dx}px, ${dy}px)`;
-                    });
-                };
-
-                const onEnd = (e) => {
-                    draggedEls.forEach(obj => obj.el.classList.remove('dragging'));
-                    const clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
-                    const clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
-
-                    // Hit detection
-                    el.style.visibility = 'hidden';
-                    const target = document.elementFromPoint(clientX, clientY);
-                    el.style.visibility = 'visible';
-
-                    const dropZone = target ? target.closest('[data-type]') : null;
-                    if (dropZone) {
-                        app.attemptMove(card, type, pIdx, cIdx, dropZone.dataset.type, parseInt(dropZone.dataset.idx));
-                    }
-
-                    window.removeEventListener('pointermove', onMove);
-                    window.removeEventListener('pointerup', onEnd);
-                    ui.render();
-                };
-
-                el.addEventListener('pointerdown', (e) => {
-                    if (!card.faceUp) return;
-                    game.save();
-                    startX = e.clientX;
-                    startY = e.clientY;
-                    
-                    // Identify stack
-                    draggedEls = [];
-                    if (type === 'tableau') {
-                        const column = el.parentElement.children;
-                        for (let i = cIdx; i < column.length; i++) {
-                            const child = column[i];
-                            child.classList.add('dragging');
-                            child.style.zIndex = 1000 + i;
-                            draggedEls.push({ el: child });
-                        }
-                    } else {
-                        el.classList.add('dragging');
-                        draggedEls.push({ el });
-                    }
-
-                    window.addEventListener('pointermove', onMove);
-                    window.addEventListener('pointerup', onEnd);
-                });
-            }
-        };
-
-        const app = {
-            draw() {
-                game.save();
-                if (game.stock.length === 0) {
-                    this.recycle();
-                    return;
-                }
-                // Draw 3 logic
-                for (let i = 0; i < 3; i++) {
-                    if (game.stock.length) {
-                        let c = game.stock.pop();
-                        c.faceUp = true;
-                        game.waste.push(c);
-                    }
-                }
-                game.moves++;
-                ui.render();
-            },
-
-            recycle() {
-                game.stock = game.waste.reverse().map(c => ({ ...c, faceUp: false }));
-                game.waste = [];
-                ui.render();
-            },
-
-            attemptMove(card, fromType, fromIdx, cardIdx, toType, toIdx) {
-                const targetPile = toType === 'tableau' ? game.tableau[toIdx] : game.foundations[toIdx];
-                const topTarget = targetPile.length ? targetPile[targetPile.length - 1] : null;
-
-                let valid = false;
-                if (toType === 'tableau') {
-                    if (!topTarget) valid = (card.value === 13); // King to empty
-                    else valid = (card.color !== topTarget.color && card.value === topTarget.value - 1);
-                } else {
-                    // Foundation: Only single card
-                    if (fromType === 'tableau' && cardIdx !== game.tableau[fromIdx].length - 1) valid = false;
-                    else {
-                        if (!topTarget) valid = (card.value === 1); // Ace to foundation
-                        else valid = (card.suit === topTarget.suit && card.value === topTarget.value + 1);
-                    }
-                }
-
-                if (valid) {
-                    let movingCards = [];
-                    if (fromType === 'tableau') {
-                        movingCards = game.tableau[fromIdx].splice(cardIdx);
-                        if (game.tableau[fromIdx].length) {
-                            game.tableau[fromIdx][game.tableau[fromIdx].length - 1].faceUp = true;
-                        }
-                    } else if (fromType === 'waste') {
-                        movingCards = [game.waste.pop()];
-                    } else if (fromType === 'foundation') {
-                        movingCards = [game.foundations[fromIdx].pop()];
-                    }
-
-                    targetPile.push(...movingCards);
-                    game.moves++;
-                    game.score += (toType === 'foundation' ? 15 : 5);
-                    this.checkWin();
-                }
-                ui.render();
-            },
-
-            undo() {
-                if (game.history.length) {
-                    const last = JSON.parse(game.history.pop());
-                    Object.assign(game, last);
-                    ui.render();
-                }
-                toggleMenu();
-            },
-
-            newGame() {
-                if (confirm("להתחיל משחק חדש?")) {
-                    game.init();
-                    ui.render();
-                    toggleMenu();
-                }
-            },
-
-            checkWin() {
-                const win = game.foundations.every(f => f.length === 13);
-                if (win) alert("כל הכבוד! ניצחת!");
-            }
-        };
-
-        function toggleMenu() {
-            document.getElementById('sideMenu').classList.toggle('open');
-            document.getElementById('overlay').classList.toggle('active');
-        }
-
-        // Init
-        ui.render();
-        if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
-    </script>
+    <!-- Scripts -->
+    <script src="js/logic.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/pwa.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>
