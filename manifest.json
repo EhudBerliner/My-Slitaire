@@ -2,7 +2,7 @@
     "name": "סוליטר פרו - Solitaire Pro",
     "short_name": "סוליטר",
     "description": "משחק סוליטר קלאסי (Klondike) עם ממשק מודרני ותכונות מתקדמות",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "start_url": "./index.html",
     "display": "standalone",
     "background_color": "#1b5e20",

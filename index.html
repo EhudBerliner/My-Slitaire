@@ -14,7 +14,6 @@
     <link rel="apple-touch-icon" href="logo.png">
 
     <style>
-        /* תוכן הקובץ style.css */
         :root {
             --card-width: 70px;
             --card-height: 98px;
@@ -29,7 +28,7 @@
             --card-back-blue: repeating-linear-gradient(45deg, #1976d2, #1976d2 10px, #1565c0 10px, #1565c0 20px);
             --card-back-red: repeating-linear-gradient(45deg, #d32f2f, #d32f2f 10px, #b71c1c 10px, #b71c1c 20px);
             --card-back-green: repeating-linear-gradient(45deg, #388e3c, #388e3c 10px, #1b5e20 10px, #1b5e20 20px);
-            --card-back-pattern: radial-gradient(circle, #444 20%, transparent 20%), radial-gradient(circle, #444 20%, transparent 20%);
+            --card-back-pattern: radial-gradient(circle at 25% 25%, #666 3px, transparent 3px), radial-gradient(circle at 75% 75%, #666 3px, transparent 3px);
             
             --current-table-bg: var(--table-bg-green);
             --current-card-back: var(--card-back-blue);
@@ -43,11 +42,14 @@
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
+            touch-action: manipulation;
         }
 
         body {
             margin: 0;
             padding: 0;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background: var(--current-table-bg);
             background-attachment: fixed;
@@ -65,10 +67,43 @@
             justify-content: space-between;
             align-items: center;
             padding: 10px 15px;
-            background: rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(5px);
-            height: 60px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            min-height: 60px;
             z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .version-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .app-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .version-badge {
+            font-size: 10px;
+            opacity: 0.7;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.1);
+            transition: all 0.2s;
+        }
+
+        .version-badge:hover {
+            opacity: 1;
+            background: rgba(255,255,255,0.2);
         }
 
         .stats-container {
@@ -95,20 +130,22 @@
         }
 
         .icon-btn {
-            background: none;
+            background: rgba(255,255,255,0.1);
             border: none;
             color: white;
             cursor: pointer;
-            padding: 5px;
+            padding: 8px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: background 0.2s;
+            width: 36px;
+            height: 36px;
         }
 
         .icon-btn:active {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.3);
         }
 
         /* Game Board */
@@ -122,6 +159,7 @@
             margin: 0 auto;
             width: 100%;
             position: relative;
+            overflow-y: auto;
         }
 
         .top-row {
@@ -140,15 +178,30 @@
             justify-content: space-between;
             width: 100%;
             flex: 1;
+            gap: 4px;
         }
 
         /* Card Styles */
         .card-slot {
             width: var(--card-width);
             height: var(--card-height);
-            border: 2px solid rgba(255, 255, 255, 0.1);
+            border: 2px dashed rgba(255, 255, 255, 0.2);
             border-radius: var(--card-radius);
             position: relative;
+            background: rgba(0,0,0,0.1);
+            flex-shrink: 0;
+        }
+
+        .pile-placeholder {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            opacity: 0.3;
+            pointer-events: none;
         }
 
         .card {
@@ -163,15 +216,18 @@
             box-shadow: var(--shadow-sm);
             display: flex;
             flex-direction: column;
+            justify-content: space-between;
             padding: 5px;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
             cursor: pointer;
             transform-origin: center;
         }
 
         .card.face-down {
             background: var(--current-card-back);
+            background-size: 20px 20px;
             border: 3px solid white;
+            cursor: default;
         }
 
         .card.face-down * {
@@ -181,19 +237,71 @@
         .card.red { color: #d32f2f; }
         .card.black { color: #212121; }
 
-        .card-value { font-weight: bold; font-size: 18px; line-height: 1; }
-        .card-suit { font-size: 20px; line-height: 1; }
+        .card-top {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .card-bottom {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            transform: rotate(180deg);
+        }
+
+        .card-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 28px;
+            opacity: 0.1;
+        }
+
+        .card-value { 
+            font-weight: bold; 
+            font-size: 18px; 
+            line-height: 1; 
+        }
+        
+        .card-suit { 
+            font-size: 20px; 
+            line-height: 1; 
+        }
 
         .card.dragging {
-            opacity: 0.8;
+            opacity: 0.85;
             transform: scale(1.05);
             box-shadow: var(--shadow-lg);
             z-index: 1000 !important;
         }
 
+        .card.hint-glow {
+            animation: hintPulse 1s ease-in-out 3;
+        }
+
+        @keyframes hintPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 235, 59, 0); }
+            50% { box-shadow: 0 0 20px 5px rgba(255, 235, 59, 0.8); }
+        }
+
         /* Tableau Stack Offset */
+        .tableau-pile {
+            position: relative;
+            min-height: 140px;
+            flex: 1;
+        }
+        
         .tableau-pile .card {
-            margin-top: 0;
+            position: absolute;
+            margin: 0;
+        }
+
+        .valid-drop-target {
+            border-color: #ffeb3b !important;
+            border-style: solid !important;
+            box-shadow: 0 0 15px rgba(255, 235, 59, 0.5);
         }
 
         /* Modals & Menus */
@@ -204,10 +312,14 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.8);
             z-index: 2000;
             justify-content: center;
             align-items: center;
+        }
+        
+        .modal.active {
+            display: flex;
         }
 
         .modal-content {
@@ -215,9 +327,54 @@
             color: #333;
             width: 90%;
             max-width: 400px;
-            padding: 20px;
+            padding: 25px;
             border-radius: 12px;
             box-shadow: var(--shadow-lg);
+            text-align: center;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .modal-content h2 {
+            margin-top: 0;
+            color: #1b5e20;
+        }
+
+        .primary-btn {
+            background: #1b5e20;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+            transition: background 0.2s;
+        }
+
+        .primary-btn:hover {
+            background: #2e7d32;
+        }
+
+        .secondary-btn {
+            background: #757575;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
         }
 
         .side-menu {
@@ -229,346 +386,303 @@
             background: #f5f5f5;
             z-index: 1500;
             transition: right 0.3s ease;
-            color: #333;
+            overflow-y: auto;
+            box-shadow: -4px 0 8px rgba(0,0,0,0.2);
             padding: 20px;
-            box-shadow: -2px 0 10px rgba(0,0,0,0.3);
+            color: #333;
         }
 
-        .side-menu.open { right: 0; }
+        .side-menu.open {
+            right: 0;
+        }
+
+        .side-menu h3 {
+            margin-top: 0;
+            border-bottom: 2px solid #1b5e20;
+            padding-bottom: 10px;
+        }
+
+        .menu-section {
+            margin: 20px 0;
+        }
+
+        .menu-item {
+            padding: 12px;
+            margin: 8px 0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: background 0.2s;
+        }
+
+        .menu-item:hover {
+            background: #e8f5e9;
+        }
+
+        .theme-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            margin: 5px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: border 0.2s;
+        }
+
+        .theme-option.active {
+            border-color: #1b5e20;
+        }
+
+        .theme-green { background: var(--table-bg-green); }
+        .theme-blue { background: var(--table-bg-blue); }
+        .theme-red { background: var(--table-bg-red); }
+        .theme-purple { background: var(--table-bg-purple); }
+        .theme-dark { background: var(--table-bg-dark); }
 
         .overlay {
             display: none;
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background: rgba(0,0,0,0.5);
             z-index: 1400;
         }
 
-        /* ... שאר ה-CSS מהקובץ style.css יופיע כאן ... */
-        /* הוספתי את העיקר, בגרסה המלאה נכניס הכל */
-        
-        .foundation-pile .pile-placeholder {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 40px;
-            opacity: 0.2;
+        .overlay.active {
+            display: block;
         }
 
-        /* Controls Bottom */
-        .controls-bottom {
-            display: flex;
-            justify-content: space-around;
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(5px);
+        /* Win Animation */
+        .card.winning {
+            animation: cardWin 1s ease-in-out;
         }
 
-        button.primary-btn {
-            background: #2e7d32;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
+        @keyframes cardWin {
+            0% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-100px) rotate(180deg); }
+            100% { transform: translateY(100vh) rotate(360deg); }
+        }
+
+        /* Stats Table */
+        .stats-table {
+            width: 100%;
+            margin: 15px 0;
+            border-collapse: collapse;
+        }
+
+        .stats-table td {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .stats-table td:first-child {
             font-weight: bold;
-            cursor: pointer;
+            text-align: right;
         }
 
-        body.theme-blue { --current-table-bg: var(--table-bg-blue); }
-        body.theme-red { --current-table-bg: var(--table-bg-red); }
-        body.theme-dark { --current-table-bg: var(--table-bg-dark); }
+        /* Responsive */
+        @media (max-width: 600px) {
+            :root {
+                --card-width: 50px;
+                --card-height: 70px;
+                --card-spacing: 4px;
+            }
+
+            .stats-container {
+                gap: 8px;
+            }
+
+            .info-label {
+                font-size: 8px;
+            }
+
+            .info-value {
+                font-size: 14px;
+            }
+
+            .card-value {
+                font-size: 14px;
+            }
+
+            .card-suit {
+                font-size: 16px;
+            }
+
+            .app-title {
+                font-size: 16px;
+            }
+        }
+
+        @media (orientation: landscape) and (max-height: 500px) {
+            header {
+                min-height: 50px;
+                padding: 5px 10px;
+            }
+
+            #gameBoard {
+                padding: 10px;
+                gap: 10px;
+            }
+        }
     </style>
 </head>
 <body>
-    <header id="mainHeader">
+    <header>
         <div class="header-left">
-            <button id="menuBtn" class="icon-btn" aria-label="תפריט">
-                <svg viewBox="0 0 24 24" width="28" height="28"><path fill="currentColor" d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" /></svg>
-            </button>
+            <button class="icon-btn" id="menuBtn" aria-label="תפריט">☰</button>
+            <div class="version-info">
+                <h1 class="app-title">סוליטר פרו</h1>
+                <span class="version-badge" id="versionBadge" title="לחץ לאיפוס מלא">v2.1.0</span>
+            </div>
         </div>
         <div class="stats-container">
             <div class="info-item">
                 <span class="info-label">זמן</span>
-                <span id="timeDisplay" class="info-value">00:00</span>
+                <span class="info-value" id="timeDisplay">00:00</span>
             </div>
             <div class="info-item">
                 <span class="info-label">מהלכים</span>
-                <span id="movesDisplay" class="info-value">0</span>
+                <span class="info-value" id="movesDisplay">0</span>
             </div>
             <div class="info-item">
                 <span class="info-label">ניקוד</span>
-                <span id="scoreDisplay" class="info-value">0</span>
+                <span class="info-value" id="scoreDisplay">0</span>
             </div>
-        </div>
-        <div class="header-right">
-            <button id="undoBtn" class="icon-btn" aria-label="ביטול מהלך">
-                <svg viewBox="0 0 24 24" width="28" height="28"><path fill="currentColor" d="M12.5,8C9.85,8 7.45,9 5.6,10.6L2,7V16H11L7.38,12.38C8.77,11.22 10.54,10.5 12.5,10.5C16.04,10.5 19.05,12.81 20.1,16L22.47,15.22C21.08,11.03 17.15,8 12.5,8Z" /></svg>
-            </button>
         </div>
     </header>
 
-    <main id="gameBoard">
+    <div id="gameBoard">
         <div class="top-row">
             <div class="stock-waste-group">
-                <div id="stock" class="card-slot stock-pile"></div>
-                <div id="waste" class="card-slot waste-pile"></div>
+                <div class="card-slot" id="stock">
+                    <span class="pile-placeholder">🔄</span>
+                </div>
+                <div class="card-slot" id="waste">
+                    <span class="pile-placeholder">📤</span>
+                </div>
             </div>
             <div class="foundation-group">
-                <div id="foundation-0" class="card-slot foundation-pile" data-suit="hearts"><div class="pile-placeholder">♥</div></div>
-                <div id="foundation-1" class="card-slot foundation-pile" data-suit="diamonds"><div class="pile-placeholder">♦</div></div>
-                <div id="foundation-2" class="card-slot foundation-pile" data-suit="clubs"><div class="pile-placeholder">♣</div></div>
-                <div id="foundation-3" class="card-slot foundation-pile" data-suit="spades"><div class="pile-placeholder">♠</div></div>
+                <div class="card-slot" id="foundation-0">
+                    <span class="pile-placeholder">♥</span>
+                </div>
+                <div class="card-slot" id="foundation-1">
+                    <span class="pile-placeholder">♦</span>
+                </div>
+                <div class="card-slot" id="foundation-2">
+                    <span class="pile-placeholder">♣</span>
+                </div>
+                <div class="card-slot" id="foundation-3">
+                    <span class="pile-placeholder">♠</span>
+                </div>
             </div>
         </div>
-        <div id="tableau" class="tableau-container"></div>
-    </main>
-
-    <div class="controls-bottom">
-        <button id="hintBtn" class="primary-btn">רמז</button>
-        <button id="newGameBtn" class="primary-btn">משחק חדש</button>
+        <div class="tableau-container" id="tableau"></div>
     </div>
 
-    <div id="overlay" class="overlay"></div>
-    <div id="sideMenu" class="side-menu">
-        <h2>הגדרות</h2>
-        <hr>
-        <p>גרסה: <span id="versionDisplay">2.0.0</span></p>
-        <button onclick="ui.setTheme('green')">ירוק</button>
-        <button onclick="ui.setTheme('blue')">כחול</button>
-        <button onclick="ui.setTheme('dark')">כהה</button>
-    </div>
+    <div class="overlay" id="overlay"></div>
 
-    <div id="winModal" class="modal">
-        <div class="modal-content">
-            <h2>🎉 כל הכבוד! 🎉</h2>
-            <p>ניצחת במשחק!</p>
-            <button onclick="location.reload()" class="primary-btn">משחק חדש</button>
+    <div class="side-menu" id="sideMenu">
+        <h3>תפריט</h3>
+        
+        <div class="menu-section">
+            <div class="menu-item" onclick="newGame()">
+                🎮 משחק חדש
+            </div>
+            <div class="menu-item" onclick="showHint()">
+                💡 רמז
+            </div>
+            <div class="menu-item" onclick="undoMove()">
+                ↩️ ביטול מהלך
+            </div>
+        </div>
+
+        <div class="menu-section">
+            <h4>ערכות נושא</h4>
+            <div style="display: flex; flex-wrap: wrap;">
+                <div class="theme-option theme-green" onclick="changeTheme('green')" data-theme="green"></div>
+                <div class="theme-option theme-blue" onclick="changeTheme('blue')" data-theme="blue"></div>
+                <div class="theme-option theme-red" onclick="changeTheme('red')" data-theme="red"></div>
+                <div class="theme-option theme-purple" onclick="changeTheme('purple')" data-theme="purple"></div>
+                <div class="theme-option theme-dark" onclick="changeTheme('dark')" data-theme="dark"></div>
+            </div>
+        </div>
+
+        <div class="menu-section">
+            <h4>גב קלף</h4>
+            <div style="display: flex; flex-wrap: wrap;">
+                <div class="theme-option" style="background: var(--card-back-blue);" onclick="changeCardBack('blue')"></div>
+                <div class="theme-option" style="background: var(--card-back-red);" onclick="changeCardBack('red')"></div>
+                <div class="theme-option" style="background: var(--card-back-green);" onclick="changeCardBack('green')"></div>
+            </div>
+        </div>
+
+        <div class="menu-section">
+            <div class="menu-item" onclick="showStats()">
+                📊 סטטיסטיקות
+            </div>
+            <div class="menu-item" onclick="resetStats()">
+                🔄 איפוס סטטיסטיקות
+            </div>
         </div>
     </div>
 
-    <script>
-        /** לוגיקת המשחק - מתוך logic.js **/
-        class SolitaireGame {
-            constructor() {
-                this.deck = [];
-                this.stock = [];
-                this.waste = [];
-                this.foundations = [[], [], [], []];
-                this.tableau = [[], [], [], [], [], [], []];
-                this.score = 0;
-                this.moves = 0;
-                this.time = 0;
-                this.history = [];
-                this.drawCount = 3;
-            }
+    <div class="modal" id="winModal">
+        <div class="modal-content">
+            <h2>🎉 מזל טוב!</h2>
+            <p>ניצחת במשחק!</p>
+            <table class="stats-table">
+                <tr>
+                    <td>זמן:</td>
+                    <td id="winTime">--</td>
+                </tr>
+                <tr>
+                    <td>מהלכים:</td>
+                    <td id="winMoves">--</td>
+                </tr>
+                <tr>
+                    <td>ניקוד:</td>
+                    <td id="winScore">--</td>
+                </tr>
+            </table>
+            <button onclick="newGame()" class="primary-btn">משחק חדש</button>
+            <button onclick="closeModal()" class="secondary-btn">סגור</button>
+        </div>
+    </div>
 
-            init() {
-                this.createDeck();
-                this.shuffle();
-                this.deal();
-                this.startTimer();
-            }
+    <div class="modal" id="statsModal">
+        <div class="modal-content">
+            <h2>📊 סטטיסטיקות</h2>
+            <table class="stats-table">
+                <tr>
+                    <td>משחקים שהושלמו:</td>
+                    <td id="totalGames">0</td>
+                </tr>
+                <tr>
+                    <td>אחוז ניצחונות:</td>
+                    <td id="winRate">0%</td>
+                </tr>
+                <tr>
+                    <td>רצף ניצחונות:</td>
+                    <td id="winStreak">0</td>
+                </tr>
+                <tr>
+                    <td>זמן ממוצע:</td>
+                    <td id="avgTime">--</td>
+                </tr>
+                <tr>
+                    <td>שיא מהלכים:</td>
+                    <td id="bestMoves">--</td>
+                </tr>
+            </table>
+            <button onclick="closeModal()" class="primary-btn">סגור</button>
+        </div>
+    </div>
 
-            createDeck() {
-                const suits = ['hearts', 'diamonds', 'clubs', 'spades'];
-                this.deck = [];
-                for (let suit of suits) {
-                    for (let value = 1; value <= 13; value++) {
-                        this.deck.push({ suit, value, faceUp: false });
-                    }
-                }
-            }
-
-            shuffle() {
-                for (let i = this.deck.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [this.deck[i], this.deck[j]] = [this.deck[j], this.deck[i]];
-                }
-            }
-
-            deal() {
-                this.tableau = [[], [], [], [], [], [], []];
-                let cardIdx = 0;
-                for (let i = 0; i < 7; i++) {
-                    for (let j = i; j < 7; j++) {
-                        let card = this.deck[cardIdx++];
-                        if (i === j) card.faceUp = true;
-                        this.tableau[j].push(card);
-                    }
-                }
-                this.stock = this.deck.slice(cardIdx);
-                this.waste = [];
-            }
-
-            startTimer() {
-                if (this.timerInterval) clearInterval(this.timerInterval);
-                this.time = 0;
-                this.timerInterval = setInterval(() => {
-                    this.time++;
-                    if (ui) ui.updateStats();
-                }, 1000);
-            }
-
-            // פונקציות שמירה וטעינה
-            saveGame() {
-                const state = { stock: this.stock, waste: this.waste, tableau: this.tableau, foundations: this.foundations, score: this.score, moves: this.moves, time: this.time };
-                localStorage.setItem('solitaire_save', JSON.stringify(state));
-            }
-
-            loadGame() {
-                const saved = localStorage.getItem('solitaire_save');
-                if (saved) {
-                    const state = JSON.parse(saved);
-                    Object.assign(this, state);
-                    return true;
-                }
-                return false;
-            }
-        }
-
-        /** ניהול ממשק המשתמש - מתוך ui.js **/
-        class UIManager {
-            constructor(game) {
-                this.game = game;
-                this.initElements();
-                this.initEventListeners();
-            }
-
-            initElements() {
-                this.timeDisplay = document.getElementById('timeDisplay');
-                this.movesDisplay = document.getElementById('movesDisplay');
-                this.scoreDisplay = document.getElementById('scoreDisplay');
-                this.tableauContainer = document.getElementById('tableau');
-                this.stockPile = document.getElementById('stock');
-                this.wastePile = document.getElementById('waste');
-            }
-
-            render() {
-                this.renderTableau();
-                this.renderStock();
-                this.renderWaste();
-                this.renderFoundations();
-                this.updateStats();
-            }
-
-            renderTableau() {
-                this.tableauContainer.innerHTML = '';
-                this.game.tableau.forEach((pile, i) => {
-                    const pileDiv = document.createElement('div');
-                    pileDiv.className = 'card-slot tableau-pile';
-                    pile.forEach((card, j) => {
-                        const cardDiv = this.createCardElement(card);
-                        cardDiv.style.top = (j * 20) + 'px';
-                        pileDiv.appendChild(cardDiv);
-                    });
-                    this.tableauContainer.appendChild(pileDiv);
-                });
-            }
-
-            createCardElement(card) {
-                const div = document.createElement('div');
-                div.className = `card ${card.faceUp ? '' : 'face-down'} ${['hearts', 'diamonds'].includes(card.suit) ? 'red' : 'black'}`;
-                if (card.faceUp) {
-                    const suits = { hearts: '♥', diamonds: '♦', clubs: '♣', spades: '♠' };
-                    const val = card.value === 1 ? 'A' : card.value === 11 ? 'J' : card.value === 12 ? 'Q' : card.value === 13 ? 'K' : card.value;
-                    div.innerHTML = `<span class="card-value">${val}</span><span class="card-suit">${suits[card.suit]}</span>`;
-                }
-                return div;
-            }
-
-            renderStock() {
-                this.stockPile.innerHTML = this.game.stock.length > 0 ? '<div class="card face-down"></div>' : '';
-            }
-
-            renderWaste() {
-                this.wastePile.innerHTML = '';
-                if (this.game.waste.length > 0) {
-                    const topCard = this.game.waste[this.game.waste.length - 1];
-                    topCard.faceUp = true;
-                    this.wastePile.appendChild(this.createCardElement(topCard));
-                }
-            }
-
-            renderFoundations() {
-                this.game.foundations.forEach((pile, i) => {
-                    const fPile = document.getElementById(`foundation-${i}`);
-                    const topCard = pile[pile.length - 1];
-                    // נקה קלפים קודמים אך שמור על ה-placeholder
-                    const placeholder = fPile.querySelector('.pile-placeholder');
-                    fPile.innerHTML = '';
-                    fPile.appendChild(placeholder);
-                    if (topCard) fPile.appendChild(this.createCardElement(topCard));
-                });
-            }
-
-            updateStats() {
-                const mins = Math.floor(this.game.time / 60);
-                const secs = this.game.time % 60;
-                this.timeDisplay.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-                this.movesDisplay.textContent = this.game.moves;
-                this.scoreDisplay.textContent = this.game.score;
-            }
-
-            setTheme(theme) {
-                document.body.className = `theme-${theme}`;
-                localStorage.setItem('solitaire_theme', theme);
-            }
-
-            initEventListeners() {
-                document.getElementById('menuBtn').onclick = () => {
-                    document.getElementById('sideMenu').classList.toggle('open');
-                    document.getElementById('overlay').style.display = 'block';
-                };
-                document.getElementById('overlay').onclick = () => {
-                    document.getElementById('sideMenu').classList.remove('open');
-                    document.getElementById('overlay').style.display = 'none';
-                };
-                this.stockPile.onclick = () => {
-                    if (this.game.stock.length > 0) {
-                        const card = this.game.stock.pop();
-                        this.game.waste.push(card);
-                    } else {
-                        this.game.stock = this.game.waste.reverse().map(c => { c.faceUp = false; return c; });
-                        this.game.waste = [];
-                    }
-                    this.game.moves++;
-                    this.render();
-                };
-            }
-        }
-
-        /** ניהול PWA - מתוך pwa.js **/
-        const PWAManager = {
-            init() {
-                if ('serviceWorker' in navigator) {
-                    navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW error', err));
-                }
-            }
-        };
-
-        /** נקודת כניסה ראשית - מתוך main.js **/
-        let game, ui;
-        function initApp() {
-            game = new SolitaireGame();
-            ui = new UIManager(game);
-            
-            if (!game.loadGame()) {
-                game.init();
-            }
-            
-            ui.render();
-            PWAManager.init();
-
-            // טעינת ערכת נושא שמורה
-            const savedTheme = localStorage.getItem('solitaire_theme');
-            if (savedTheme) ui.setTheme(savedTheme);
-
-            // שמירה אוטומטית כל 5 שניות
-            setInterval(() => game.saveGame(), 5000);
-        }
-
-        window.onload = initApp;
-    </script>
+    <script src="game.js"></script>
 </body>
 </html>
