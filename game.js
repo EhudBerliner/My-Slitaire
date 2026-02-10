@@ -5,7 +5,7 @@
  */
 
 const VERSION = '2.1.0';
-const CARD_OFFSET = 20;
+const CARD_OFFSET = 30;
 
 /**  
  * Main Game Class
@@ -21,7 +21,7 @@ class SolitaireGame {
         this.moves = 0;
         this.time = 0;
         this.history = [];
-        this.drawCount = 1;
+        this.drawCount = 3;
         this.timerInterval = null;
     }
 
@@ -689,7 +689,7 @@ class UIManager {
     }
 
     async forceReinstall() {
-        if (!confirm('האם אתה בטוח? פעולה זו תמחק את כל הנתונים ותתקין מחדש את האפליקציה.')) {
+        if (!confirm('Are you sure? This will delete all data and reinstall the application.')) {
             return;
         }
         
@@ -705,7 +705,7 @@ class UIManager {
             window.location.reload(true);
         } catch (error) {
             console.error('Force reinstall failed:', error);
-            alert('שגיאה באיפוס. נסה לרענן את הדף.');
+            alert('Reset error. Try refreshing the page.');
         }
     }
 
@@ -721,7 +721,7 @@ class UIManager {
             
             if (navigator.vibrate) navigator.vibrate(50);
         } else {
-            alert('לא נמצאו מהלכים אפשריים. נסה למשוך קלף מהערימה.');
+            alert('No possible moves found. Try drawing from the deck.');
         }
     }
 }
@@ -780,7 +780,7 @@ const PWAManager = {
  */
 function newGame() {
     if (window.game.moves > 0) {
-        if (!confirm('האם אתה בטוח? המשחק הנוכחי יאבד.')) {
+        if (!confirm('Are you sure? The current game will be lost.')) {
             return;
         }
     }
@@ -798,7 +798,7 @@ function showHint() {
 }
 
 function undoMove() {
-    alert('תכונת ביטול מהלך תתווסף בעדכון הבא');
+    alert('Undo feature will be added in the next update');
     window.ui.closeMenu();
 }
 
@@ -858,10 +858,10 @@ function showStats() {
 }
 
 function resetStats() {
-    if (confirm('האם אתה בטוח? כל הסטטיסטיקות יימחקו.')) {
+    if (confirm('Are you sure? All statistics will be deleted.')) {
         localStorage.removeItem('solitaire_stats');
         window.ui.closeMenu();
-        alert('הסטטיסטיקות אופסו');
+        alert('Statistics have been reset');
     }
 }
 

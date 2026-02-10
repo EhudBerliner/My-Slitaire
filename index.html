@@ -1,25 +1,25 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>סוליטר פרו - Solitaire Pro</title>
+    <title>Solitaire Pro - Classic Card Game</title>
     
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="manifest-en.json">
     <meta name="theme-color" content="#1b5e20">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="סוליטר פרו">
+    <meta name="apple-mobile-web-app-title" content="Solitaire Pro">
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="apple-touch-icon" href="logo.png">
 
     <style>
         :root {
-            --card-width: 70px;
-            --card-height: 98px;
+            --card-width: 80px;
+            --card-height: 112px;
             --card-ratio: 1.4;
             --card-radius: 8px;
-            --card-spacing: 8px;
+            --card-spacing: 12px;
             --table-bg-green: linear-gradient(135deg, #1b5e20 0%, #2e7d32 50%, #388e3c 100%);
             --table-bg-blue: linear-gradient(135deg, #0d47a1 0%, #1565c0 50%, #1976d2 100%);
             --table-bg-red: linear-gradient(135deg, #b71c1c 0%, #c62828 50%, #d32f2f 100%);
@@ -289,7 +289,7 @@
         /* Tableau Stack Offset */
         .tableau-pile {
             position: relative;
-            min-height: 140px;
+            min-height: 200px;
             flex: 1;
         }
         
@@ -380,20 +380,20 @@
         .side-menu {
             position: fixed;
             top: 0;
-            right: -300px;
+            left: -300px;
             width: 280px;
             height: 100%;
             background: #f5f5f5;
             z-index: 1500;
-            transition: right 0.3s ease;
+            transition: left 0.3s ease;
             overflow-y: auto;
-            box-shadow: -4px 0 8px rgba(0,0,0,0.2);
+            box-shadow: 4px 0 8px rgba(0,0,0,0.2);
             padding: 20px;
             color: #333;
         }
 
         .side-menu.open {
-            right: 0;
+            left: 0;
         }
 
         .side-menu h3 {
@@ -482,15 +482,15 @@
 
         .stats-table td:first-child {
             font-weight: bold;
-            text-align: right;
+            text-align: left;
         }
 
         /* Responsive */
         @media (max-width: 600px) {
             :root {
-                --card-width: 50px;
-                --card-height: 70px;
-                --card-spacing: 4px;
+                --card-width: 60px;
+                --card-height: 84px;
+                --card-spacing: 6px;
             }
 
             .stats-container {
@@ -534,23 +534,23 @@
 <body>
     <header>
         <div class="header-left">
-            <button class="icon-btn" id="menuBtn" aria-label="תפריט">☰</button>
+            <button class="icon-btn" id="menuBtn" aria-label="Menu">☰</button>
             <div class="version-info">
-                <h1 class="app-title">סוליטר פרו</h1>
-                <span class="version-badge" id="versionBadge" title="לחץ לאיפוס מלא">v2.1.0</span>
+                <h1 class="app-title">Solitaire Pro</h1>
+                <span class="version-badge" id="versionBadge" title="Click to force reinstall">v2.1.0</span>
             </div>
         </div>
         <div class="stats-container">
             <div class="info-item">
-                <span class="info-label">זמן</span>
+                <span class="info-label">Time</span>
                 <span class="info-value" id="timeDisplay">00:00</span>
             </div>
             <div class="info-item">
-                <span class="info-label">מהלכים</span>
+                <span class="info-label">Moves</span>
                 <span class="info-value" id="movesDisplay">0</span>
             </div>
             <div class="info-item">
-                <span class="info-label">ניקוד</span>
+                <span class="info-label">Score</span>
                 <span class="info-value" id="scoreDisplay">0</span>
             </div>
         </div>
@@ -587,22 +587,22 @@
     <div class="overlay" id="overlay"></div>
 
     <div class="side-menu" id="sideMenu">
-        <h3>תפריט</h3>
+        <h3>Menu</h3>
         
         <div class="menu-section">
             <div class="menu-item" onclick="newGame()">
-                🎮 משחק חדש
+                🎮 New Game
             </div>
             <div class="menu-item" onclick="showHint()">
-                💡 רמז
+                💡 Hint
             </div>
             <div class="menu-item" onclick="undoMove()">
-                ↩️ ביטול מהלך
+                ↩️ Undo Move
             </div>
         </div>
 
         <div class="menu-section">
-            <h4>ערכות נושא</h4>
+            <h4>Themes</h4>
             <div style="display: flex; flex-wrap: wrap;">
                 <div class="theme-option theme-green" onclick="changeTheme('green')" data-theme="green"></div>
                 <div class="theme-option theme-blue" onclick="changeTheme('blue')" data-theme="blue"></div>
@@ -613,7 +613,7 @@
         </div>
 
         <div class="menu-section">
-            <h4>גב קלף</h4>
+            <h4>Card Back</h4>
             <div style="display: flex; flex-wrap: wrap;">
                 <div class="theme-option" style="background: var(--card-back-blue);" onclick="changeCardBack('blue')"></div>
                 <div class="theme-option" style="background: var(--card-back-red);" onclick="changeCardBack('red')"></div>
@@ -623,66 +623,66 @@
 
         <div class="menu-section">
             <div class="menu-item" onclick="showStats()">
-                📊 סטטיסטיקות
+                📊 Statistics
             </div>
             <div class="menu-item" onclick="resetStats()">
-                🔄 איפוס סטטיסטיקות
+                🔄 Reset Statistics
             </div>
         </div>
     </div>
 
     <div class="modal" id="winModal">
         <div class="modal-content">
-            <h2>🎉 מזל טוב!</h2>
-            <p>ניצחת במשחק!</p>
+            <h2>🎉 Congratulations!</h2>
+            <p>You won the game!</p>
             <table class="stats-table">
                 <tr>
-                    <td>זמן:</td>
+                    <td>Time:</td>
                     <td id="winTime">--</td>
                 </tr>
                 <tr>
-                    <td>מהלכים:</td>
+                    <td>Moves:</td>
                     <td id="winMoves">--</td>
                 </tr>
                 <tr>
-                    <td>ניקוד:</td>
+                    <td>Score:</td>
                     <td id="winScore">--</td>
                 </tr>
             </table>
-            <button onclick="newGame()" class="primary-btn">משחק חדש</button>
-            <button onclick="closeModal()" class="secondary-btn">סגור</button>
+            <button onclick="newGame()" class="primary-btn">New Game</button>
+            <button onclick="closeModal()" class="secondary-btn">Close</button>
         </div>
     </div>
 
     <div class="modal" id="statsModal">
         <div class="modal-content">
-            <h2>📊 סטטיסטיקות</h2>
+            <h2>📊 Statistics</h2>
             <table class="stats-table">
                 <tr>
-                    <td>משחקים שהושלמו:</td>
+                    <td>Games Completed:</td>
                     <td id="totalGames">0</td>
                 </tr>
                 <tr>
-                    <td>אחוז ניצחונות:</td>
+                    <td>Win Rate:</td>
                     <td id="winRate">0%</td>
                 </tr>
                 <tr>
-                    <td>רצף ניצחונות:</td>
+                    <td>Win Streak:</td>
                     <td id="winStreak">0</td>
                 </tr>
                 <tr>
-                    <td>זמן ממוצע:</td>
+                    <td>Average Time:</td>
                     <td id="avgTime">--</td>
                 </tr>
                 <tr>
-                    <td>שיא מהלכים:</td>
+                    <td>Best Moves:</td>
                     <td id="bestMoves">--</td>
                 </tr>
             </table>
-            <button onclick="closeModal()" class="primary-btn">סגור</button>
+            <button onclick="closeModal()" class="primary-btn">Close</button>
         </div>
     </div>
 
-    <script src="game.js"></script>
+    <script src="game-en.js"></script>
 </body>
 </html>

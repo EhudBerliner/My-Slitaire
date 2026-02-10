@@ -1,16 +1,16 @@
 {
-    "name": "סוליטר פרו - Solitaire Pro",
-    "short_name": "סוליטר",
-    "description": "משחק סוליטר קלאסי (Klondike) עם ממשק מודרני ותכונות מתקדמות",
+    "name": "Solitaire Pro - Classic Card Game",
+    "short_name": "Solitaire",
+    "description": "Classic Klondike Solitaire game with modern interface and advanced features",
     "version": "2.1.0",
-    "start_url": "./index.html",
+    "start_url": "./index-en.html",
     "display": "standalone",
     "background_color": "#1b5e20",
     "theme_color": "#1b5e20",
     "orientation": "any",
     "scope": "./",
-    "dir": "rtl",
-    "lang": "he",
+    "dir": "ltr",
+    "lang": "en",
     "categories": ["games", "entertainment"],
     "icons": [
         {
@@ -29,10 +29,10 @@
     "screenshots": [],
     "shortcuts": [
         {
-            "name": "משחק חדש",
-            "short_name": "חדש",
-            "description": "התחל משחק חדש",
-            "url": "./index.html?action=new",
+            "name": "New Game",
+            "short_name": "New",
+            "description": "Start a new game",
+            "url": "./index-en.html?action=new",
             "icons": [
                 {
                     "src": "logo.png",
