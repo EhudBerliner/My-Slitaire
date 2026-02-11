@@ -4,8 +4,8 @@
  * Full Klondike Solitaire implementation
  */
 
-const VERSION = '2.2.0';
-const CARD_OFFSET = 38;
+const VERSION = '2.3.0';
+const CARD_OFFSET = 28;
 
 /**  
  * Main Game Class
