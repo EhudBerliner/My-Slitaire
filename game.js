@@ -4,8 +4,8 @@
  * Full Klondike Solitaire implementation
  */
 
-const VERSION = '2.1.0';
-const CARD_OFFSET = 30;
+const VERSION = '2.2.0';
+const CARD_OFFSET = 38;
 
 /**  
  * Main Game Class
@@ -802,6 +802,26 @@ function undoMove() {
     window.ui.closeMenu();
 }
 
+function autoComplete() {
+    if (!confirm('Auto-complete will move all possible cards to foundations. Continue?')) {
+        return;
+    }
+    
+    window.ui.closeMenu();
+    
+    const interval = setInterval(() => {
+        const moved = window.game.autoMoveToFoundation();
+        if (!moved) {
+            clearInterval(interval);
+            if (window.game.foundations.reduce((s, f) => s + f.length, 0) === 52) {
+                setTimeout(() => {
+                    alert('Congratulations! Game completed!');
+                }, 500);
+            }
+        }
+    }, 300);
+}
+
 function changeTheme(theme) {
     const themes = {
         green: '--table-bg-green',
@@ -863,6 +883,12 @@ function resetStats() {
         window.ui.closeMenu();
         alert('Statistics have been reset');
     }
+}
+
+function showHelp() {
+    document.getElementById('helpModal').classList.add('active');
+    document.getElementById('overlay').classList.add('active');
+    window.ui.closeMenu();
 }
 
 function closeModal() {
