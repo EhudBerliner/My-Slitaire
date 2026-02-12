@@ -2,7 +2,7 @@
     "name": "Solitaire Pro - Classic Card Game",
     "short_name": "Solitaire",
     "description": "Classic Klondike Solitaire game with modern interface and advanced features",
-    "version": "2.3.0",
+    "version": "2.4.0",
     "start_url": "./index.html",
     "display": "standalone",
     "background_color": "#1b5e20",

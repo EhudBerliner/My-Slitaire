@@ -4,7 +4,7 @@
  * Full Klondike Solitaire implementation
  */
 
-const VERSION = '2.3.0';
+const VERSION = '2.4.0';
 const CARD_OFFSET = 28;
 
 /**  
@@ -573,11 +573,18 @@ class UIManager {
                 cardDiv.dataset.pile = pileIndex;
                 cardDiv.dataset.index = cardIndex;
                 
-                cardDiv.ondblclick = (e) => {
-                    e.preventDefault();
-                    if (cardIndex === pile.length - 1) {
-                        this.game.autoMoveToFoundation();
+                // Double-tap handler for tableau cards
+                let lastTapTime = 0;
+                cardDiv.onclick = (e) => {
+                    const currentTime = new Date().getTime();
+                    const tapLength = currentTime - lastTapTime;
+                    
+                    if (tapLength < 300 && tapLength > 0) {
+                        // Double-tap detected
+                        e.preventDefault();
+                        this.handleTableauDoubleTap(pileIndex, cardIndex);
                     }
+                    lastTapTime = currentTime;
                 };
                 
                 pileDiv.appendChild(cardDiv);
@@ -606,13 +613,14 @@ class UIManager {
                                card.value === 13 ? 'K' : 
                                card.value;
             
+            // Diagonal corners design
             div.innerHTML = `
-                <div class="card-top">
+                <div class="card-corner card-corner-tl">
                     <span class="card-value">${displayValue}</span>
                     <span class="card-suit">${suits[card.suit]}</span>
                 </div>
                 <div class="card-center">${suits[card.suit]}</div>
-                <div class="card-bottom">
+                <div class="card-corner card-corner-br">
                     <span class="card-value">${displayValue}</span>
                     <span class="card-suit">${suits[card.suit]}</span>
                 </div>
@@ -724,6 +732,56 @@ class UIManager {
             alert('No possible moves found. Try drawing from the deck.');
         }
     }
+
+    handleTableauDoubleTap(sourcePileIndex, cardIndex) {
+        const sourcePile = this.game.tableau[sourcePileIndex];
+        const card = sourcePile[cardIndex];
+        
+        // Only allow double-tap on face-up cards
+        if (!card || !card.faceUp) return;
+        
+        // Only move if it's the top card
+        if (cardIndex !== sourcePile.length - 1) return;
+        
+        // Try to move to foundations first
+        for (let i = 0; i < 4; i++) {
+            if (this.game.canPlaceOnFoundation(card, i)) {
+                if (this.game.moveToFoundation(card, sourcePile, i)) {
+                    // Add animation
+                    const cardElement = document.querySelector(`.card[data-card-id="${card.id}"]`);
+                    if (cardElement) {
+                        cardElement.classList.add('auto-jumping');
+                        setTimeout(() => cardElement.classList.remove('auto-jumping'), 500);
+                    }
+                    
+                    if (navigator.vibrate) navigator.vibrate(20);
+                    this.render();
+                    return;
+                }
+            }
+        }
+        
+        // Try to move to another tableau pile
+        for (let i = 0; i < 7; i++) {
+            if (i === sourcePileIndex) continue;
+            
+            const targetPile = this.game.tableau[i];
+            if (this.game.canPlaceOnTableau(card, targetPile)) {
+                if (this.game.moveCards(sourcePile, cardIndex, targetPile)) {
+                    // Add animation
+                    const cardElement = document.querySelector(`.card[data-card-id="${card.id}"]`);
+                    if (cardElement) {
+                        cardElement.classList.add('auto-jumping');
+                        setTimeout(() => cardElement.classList.remove('auto-jumping'), 500);
+                    }
+                    
+                    if (navigator.vibrate) navigator.vibrate(20);
+                    this.render();
+                    return;
+                }
+            }
+        }
+    }
 }
 
 /**
@@ -802,26 +860,6 @@ function undoMove() {
     window.ui.closeMenu();
 }
 
-function autoComplete() {
-    if (!confirm('Auto-complete will move all possible cards to foundations. Continue?')) {
-        return;
-    }
-    
-    window.ui.closeMenu();
-    
-    const interval = setInterval(() => {
-        const moved = window.game.autoMoveToFoundation();
-        if (!moved) {
-            clearInterval(interval);
-            if (window.game.foundations.reduce((s, f) => s + f.length, 0) === 52) {
-                setTimeout(() => {
-                    alert('Congratulations! Game completed!');
-                }, 500);
-            }
-        }
-    }, 300);
-}
-
 function changeTheme(theme) {
     const themes = {
         green: '--table-bg-green',
@@ -883,12 +921,6 @@ function resetStats() {
         window.ui.closeMenu();
         alert('Statistics have been reset');
     }
-}
-
-function showHelp() {
-    document.getElementById('helpModal').classList.add('active');
-    document.getElementById('overlay').classList.add('active');
-    window.ui.closeMenu();
 }
 
 function closeModal() {

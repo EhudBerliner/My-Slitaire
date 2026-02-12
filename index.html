@@ -14,7 +14,6 @@
 
     <style>
         :root {
-            /* Compact card sizes for more space */
             --card-width: 72px;
             --card-height: 100px;
             --card-radius: 8px;
@@ -66,7 +65,6 @@
             inset: 0;
         }
 
-        /* Ultra-compact header for mobile */
         header {
             display: flex;
             justify-content: space-between;
@@ -151,7 +149,6 @@
             transform: scale(0.95);
         }
 
-        /* Full-height game board */
         #gameBoard {
             flex: 1;
             padding: 5px;
@@ -176,7 +173,6 @@
             gap: var(--card-spacing);
         }
 
-        /* Flexible tableau that fills remaining space */
         .tableau-container {
             display: flex;
             justify-content: space-between;
@@ -230,10 +226,7 @@
             left: 0;
             color: black;
             box-shadow: var(--shadow-sm);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 7px;
+            padding: 6px;
             transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), 
                         box-shadow 0.25s ease;
             cursor: grab;
@@ -257,27 +250,23 @@
         .card.red { color: #e53935; }
         .card.black { color: #1a237e; }
 
-        .card-top, .card-bottom {
+        .card-corner {
+            position: absolute;
             display: flex;
             flex-direction: column;
+            align-items: center;
             gap: 1px;
         }
 
-        .card-top { align-items: flex-start; }
-        
-        .card-bottom {
-            align-items: flex-end;
-            transform: rotate(180deg);
+        .card-corner-tl {
+            top: 6px;
+            left: 6px;
         }
 
-        .card-center {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 38px;
-            opacity: 0.08;
-            font-weight: bold;
+        .card-corner-br {
+            bottom: 6px;
+            right: 6px;
+            transform: rotate(180deg);
         }
 
         .card-value { 
@@ -290,6 +279,16 @@
         .card-suit { 
             font-size: 22px; 
             line-height: 1;
+        }
+
+        .card-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 38px;
+            opacity: 0.08;
+            font-weight: bold;
         }
 
         .card.dragging {
@@ -312,6 +311,17 @@
                 box-shadow: 0 0 25px 8px rgba(255, 235, 59, 0.9);
                 transform: scale(1.05);
             }
+        }
+
+        .card.auto-jumping {
+            animation: autoJump 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 999 !important;
+        }
+
+        @keyframes autoJump {
+            0% { transform: scale(1) translateY(0); }
+            50% { transform: scale(1.2) translateY(-30px); }
+            100% { transform: scale(1) translateY(0); }
         }
 
         .tableau-pile {
@@ -514,7 +524,6 @@
             text-align: left;
         }
 
-        /* Mobile optimizations - even more compact */
         @media (max-width: 600px) {
             :root {
                 --card-width: 58px;
@@ -535,8 +544,6 @@
             .card-value { font-size: 17px; }
             .card-suit { font-size: 19px; }
             .card-center { font-size: 30px; }
-            .card { padding: 5px; }
-            .pile-placeholder { font-size: 26px; }
             .tableau-pile { min-height: 130px; }
             
             .app-title { font-size: 14px; }
@@ -554,11 +561,9 @@
 
             .card-value { font-size: 15px; }
             .card-suit { font-size: 17px; }
-            .card { padding: 4px; }
             .pile-placeholder { font-size: 22px; }
         }
 
-        /* Landscape mode - ultra compact */
         @media (orientation: landscape) and (max-height: 500px) {
             header { 
                 min-height: 38px; 
@@ -575,7 +580,6 @@
             .app-title { font-size: 13px; }
         }
 
-        /* Ensure tableau fills all available space */
         @media (max-height: 700px) {
             .tableau-pile {
                 min-height: 120px;
@@ -601,7 +605,7 @@
             <button class="icon-btn" id="menuBtn">☰</button>
             <div class="version-info">
                 <h1 class="app-title">Solitaire Pro</h1>
-                <span class="version-badge" id="versionBadge">v2.3.0</span>
+                <span class="version-badge" id="versionBadge">v2.4.0</span>
             </div>
         </div>
         <div class="stats-container">
@@ -721,7 +725,7 @@
             <p><strong>🎯 Goal:</strong> Move all cards to foundations</p>
             <p><strong>🎴 Foundations:</strong> Start with Ace, build up by suit</p>
             <p><strong>📚 Tableau:</strong> Build down, alternating colors</p>
-            <p><strong>🎮 Controls:</strong> Drag cards, double-click to auto-move</p>
+            <p><strong>🎮 Double-tap:</strong> Auto-move card to matching tableau pile or foundation</p>
             <button onclick="closeModal()" class="primary-btn" style="width: 100%; margin-top: 15px;">Got it!</button>
         </div>
     </div>
